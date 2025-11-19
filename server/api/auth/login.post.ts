@@ -1,5 +1,5 @@
-import { loginUser } from "../services/user.service";
-import { createSession } from "../services/session.service";
+import { loginUser } from "../../services/user.service";
+import { createSession } from "../../services/session.service";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     throw createError({
-      statusCode: 401,
+      statusCode: 500,
       statusMessage: error.message || "login failed",
     });
   }

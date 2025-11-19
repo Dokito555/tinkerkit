@@ -1,4 +1,4 @@
-import { deleteSession } from "../services/session.service"
+import { deleteSession } from "../../services/session.service"
 
 export default defineEventHandler(async (event) => {
   const token = getCookie(event, 'auth_token')

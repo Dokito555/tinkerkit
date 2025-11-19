@@ -1,4 +1,4 @@
-import { getSessionByToken } from "../api/services/session.service"
+import { getSessionByToken } from "../services/session.service"
 
 export default defineEventHandler(async (event) => {
   const path = event.path

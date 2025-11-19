@@ -8,21 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  username  String    @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
+  username  String     @unique
   password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   sessions  Session[]
 }
 
 model Session {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
-  token     String   @unique
+  token     String    @unique
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -30,16 +30,17 @@ model Session {
 }
 
 model Item {
-  id        String   @id @default(uuid())
-  name      String
-  tag       String
-  status    Boolean  @default(true)
-  createdAt DateTime
-  updatedAt DateTime
+  id          String    @id @default(uuid())
+  name        String
+  tag         String
+  price       Int
+  isAvailable Boolean   @default(true)
+  createdAt   DateTime
+  updatedAt   DateTime
 }
 
 model BorrowedItem {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
   itemId    String
   Duration  DateTime

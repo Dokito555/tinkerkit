@@ -1,5 +1,5 @@
-import { registerUser } from "../services/user.service";
-import { createSession } from "../services/session.service";
+import { registerUser } from "../../services/user.service";
+import { createSession } from "../../services/session.service";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     throw createError({
-      statusCode: 400,
-      statusMessage: error.message || "Registration failed",
+      statusCode: 500,
+      statusMessage: error.message || "registration failed",
     });
   }
 });
