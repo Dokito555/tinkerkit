@@ -10,9 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.4.5",
     "@prisma/extension-accelerate": "^2.0.2",
     "@prisma/nuxt": "^0.3.0",
     "bcrypt": "^6.0.0",
+    "elysia": "^1.4.16",
     "nuxt": "^4.2.1",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3"
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.10.1",
+    "nuxt-elysia": "^0.2.0",
     "prisma": "^6.19.0"
   }
 }
