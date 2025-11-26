@@ -18,7 +18,6 @@ export async function createSession(userId: string) {
             select: {
             id: true,
             email: true,
-            username: true,
             createdAt: true,
             },
         },
@@ -36,7 +35,6 @@ export async function getSessionByToken(token: string) {
             select: {
             id: true,
             email: true,
-            username: true,
             createdAt: true,
             },
         },

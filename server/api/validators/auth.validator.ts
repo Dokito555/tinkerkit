@@ -20,7 +20,4 @@ export const registerRequest = t.Object({
         minLength: 8,
         error: 'Password must be at least 8 characters'
     }),
-    username: t.String({
-        minLength: 2
-    })
 })

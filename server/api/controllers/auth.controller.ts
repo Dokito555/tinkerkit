@@ -33,7 +33,6 @@ export const authController = (app: Elysia) => {
             try {
                 const user = await registerUser(
                     body.email,
-                    body.username,
                     body.password,
                 )
 

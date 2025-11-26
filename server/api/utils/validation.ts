@@ -12,19 +12,3 @@ export function validatePassword(password: string): {
   }
   return { valid: true };
 }
-
-export function validateUsername(username: string): {
-  valid: boolean;
-  message?: string;
-} {
-  if (username.length < 3) {
-    return { valid: false, message: "username must be at least 3 characters" };
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return {
-      valid: false,
-      message: "username can only contain letters, numbers, and underscores",
-    };
-  }
-  return { valid: true };
-}
