@@ -1,11 +1,24 @@
 import Elysia from "elysia"
-import { itemIdSchema, querySchema } from "../validators/items.validator"
-import { deleteItem, getAllItems, getItem, updateItemAvaiabelityStatus } from "../services/item.service"
+import { createItemRequest, itemIdSchema, querySchema } from "../validators/items.validator"
+import { createItem, deleteItem, getAllItems, getItem, updateItemAvaiabelityStatus } from "../services/item.service"
 import { errorResponse, successResponse } from "../utils/response.util"
 
 export const itemController = (app: Elysia) => {
     return app.group('/items', (app) => 
         app
+        .post('/', async ({body}) => {
+            const {name, price, tag} = body
+
+            const item = await createItem(
+                name,
+                tag,
+                price,
+            )
+            
+            return successResponse(item);
+        }, {
+            body: createItemRequest
+        })
         .get('/', async ({query}) => {
             const page = Number(query.page) || 1
             const limit = Number(query.limit) || 10

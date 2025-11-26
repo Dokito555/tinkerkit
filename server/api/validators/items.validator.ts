@@ -7,9 +7,9 @@ export const createItemRequest = t.Object({
     price: t.Number({
         minimum: 0
     }),
-    isAvailable: t.Boolean(
-        t.Boolean({ default: true })
-    )
+    tag: t.String({
+        minLength: 1
+    }),
 })
 
 export const itemIdSchema = t.Object({

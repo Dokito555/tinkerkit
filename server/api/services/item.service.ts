@@ -1,12 +1,12 @@
 import prisma from "~~/server/db/prisma";
 import { ItemRequestModel } from "../models/item.model";
 
-export async function createItem(item: ItemRequestModel) {
+export async function createItem(name: string, tag: string, price: number) {
     const i = await prisma.item.create({
         data: {
-            name: String(item.name),
-            tag: String(item.tag),
-            price: Number(item.price),
+            name: String(name),
+            tag: String(tag),
+            price: Number(price),
             isAvailable: true,
             createdAt: new Date(),
             updatedAt: new Date(),
