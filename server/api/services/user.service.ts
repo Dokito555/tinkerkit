@@ -35,13 +35,13 @@ export async function registerUser(
 
     const user = await prisma.user.create({
         data: {
-        email,
-        password: String(hashedPassword),
+            email,
+            password: String(hashedPassword),
         },
         select: {
-        id: true,
-        email: true,
-        createdAt: true,
+            id: true,
+            email: true,
+            createdAt: true,
         },
     })
 

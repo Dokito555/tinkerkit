@@ -12,13 +12,14 @@ export const createItemRequest = t.Object({
     }),
 })
 
-export const itemIdSchema = t.Object({
+export const itemIdRequest = t.Object({
     id: t.String({
-        minLength: 1
+        format: 'uuid',
+        error: 'wrong id format'
     })
 })
 
-export const querySchema = t.Object({
+export const itemQueryRequest = t.Object({
     page: t.Optional(
         t.Numeric({
             default: 1

@@ -21,3 +21,10 @@ export const registerRequest = t.Object({
         error: 'Password must be at least 8 characters'
     }),
 })
+
+export const getUserById = t.Object({
+    id: t.String({
+        format: 'uuid',
+        error: 'invalid id'
+    })
+})

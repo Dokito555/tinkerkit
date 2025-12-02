@@ -14,11 +14,11 @@ export function successResponse<T>(data?: T, message = 'success'): ApiResponse<T
     }
 }
 
-export function errorResponse(error: string, status?: number, details?: any): ApiResponse {
+export function errorResponse(message: string, status?: number, details?: any): ApiResponse {
     return {
         success: false,
-        message: 'Error',
-        error,
+        message,
+        error: details instanceof Error ? details.message : details,
         details
-    }
+     };
 }

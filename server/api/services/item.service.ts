@@ -10,6 +10,7 @@ export async function createItem(name: string, tag: string, price: number) {
             isAvailable: true,
             createdAt: new Date(),
             updatedAt: new Date(),
+            status: "AVAILABLE"
         },
     });
   return i;

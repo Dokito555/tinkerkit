@@ -5,5 +5,8 @@ export default defineNuxtConfig({
   experimental: {
     componentIslands: true,
   },
-  devtools: { enabled: true }
+  devtools: { enabled: true },
+  nitro: {
+    moduleSideEffects: ['@prisma/client'],
+  },
 })

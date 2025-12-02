@@ -35,6 +35,7 @@ export async function getSessionByToken(token: string) {
             select: {
             id: true,
             email: true,
+            role: true,
             createdAt: true,
             },
         },
