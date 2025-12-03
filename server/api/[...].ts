@@ -3,6 +3,7 @@ import { errorResponse } from './utils/response.util'
 import { getSessionByToken } from './services/session.service'
 import { authController } from './controllers/auth.controller'
 import { itemController } from './controllers/item.controller'
+import { borrowController } from './controllers/borrow.controller'
 
 const app = new Elysia({ prefix: '/api' })
     .derive(async ({ cookie }) => {
@@ -16,6 +17,7 @@ const app = new Elysia({ prefix: '/api' })
     
     .use(authController)
     .use(itemController)
+    .use(borrowController)
 
     .onError(({ code, error, set }) => {
         if (code === 'VALIDATION') {

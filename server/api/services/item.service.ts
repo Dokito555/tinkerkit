@@ -1,5 +1,4 @@
 import prisma from "~~/server/db/prisma";
-import { ItemRequestModel } from "../models/item.model";
 
 export async function createItem(name: string, tag: string, price: number) {
     const i = await prisma.item.create({

@@ -4,48 +4,92 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // url = "postgresql://postgres:postgres123@localhost:5432/tinkerkit?schema=public"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ItemStatus {
+  AVAILABLE
+  UNAVAILABLE
+  MAINTENANCE
+}
+
+enum BorrowStatus {
+  BORROWED
+  RETURNED
+  LATE
+  CANCELED
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  role      String     @default("user")
-  sessions  Session[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sessions      Session[]
+  borrowedItems BorrowedItem[]
 }
 
 model Session {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   userId    String
-  token     String    @unique
+  token     String   @unique
   expiresAt DateTime
-  createdAt DateTime  @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([token])
 }
 
 model Item {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
   tag         String
   price       Int
-  status      String  
-  isAvailable Boolean   @default(true)
+  status      ItemStatus @default(AVAILABLE)
+  quantity    Int        @default(1)
+  isAvailable Boolean    @default(true)
   createdAt   DateTime
   updatedAt   DateTime
+
+  borrowedItems BorrowedItem[]
 }
 
 model BorrowedItem {
-  id        String    @id @default(uuid())
-  userId    String
-  itemId    String
-  Duration  DateTime
-  createdAt DateTime
-  updatedAt DateTime
+  id           String       @id @default(uuid())
+  userId       String
+  itemId       String
+  borrowedAt   DateTime     @default(now())
+  dueDate      DateTime
+  status       BorrowStatus @default(BORROWED)
+  returnedAt   DateTime?
+  durationDays Int?
+  createdAt    DateTime
+  updatedAt    DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
   @@index([userId])
+  @@index([itemId])
+}
+
+model BorrowedItemHistory {
+  id           String       @id @default(uuid())
+  userId       String
+  itemId       String
+  borrowedAt   DateTime     @default(now())
+  dueDate      DateTime
+  returnedAt   DateTime?
+  durationDays Int?
+  createdAt    DateTime
+  updatedAt    DateTime
 }

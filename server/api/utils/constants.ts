@@ -1,9 +1,7 @@
 
 enum ItemStatus {
-    PENDING,
-    REQUESTED,
-    APPROVED,
-    ONLOAN,
-    REJECTED,
-    RETURNED
+    BORROWED,
+    RETURNED,
+    LATE,
+    CANCELED
 }
