@@ -1,6 +1,10 @@
+<!-- app/app.vue -->
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
+  <div class="app">
+    <index />
   </div>
 </template>
+
+<script setup lang="ts">
+import index from './pages/index.vue';
+</script>
