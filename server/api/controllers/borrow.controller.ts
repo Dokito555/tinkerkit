@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { checkoutItem, checkOverdue, createBorrowRequest, getAllRequests, getBorrowRequest, getUserBorrowHistory, rejectRequest, returnItem } from "../services/borrow.service";
+import { approveRequest, checkoutItem, checkOverdue, createBorrowRequest, getAllRequests, getBorrowRequest, getUserBorrowHistory, rejectRequest, returnItem } from "../services/borrow.service";
 import { borrowPagination, createBorrowRequestRequest, getRequestId, myRequestsRequest, returnItemRequest } from "../validators/borrow.validator";
 import { errorResponse, successResponse } from "../utils/response.util";
 
@@ -141,14 +141,14 @@ export const borrowController = (app: Elysia) => {
             })
             .guard({
                 beforeHandle: ({ user, set }: any) => {
-                    if (!user || user.role !== 'admin') {
+                    if (!user || user.role !== 'ADMIN') {
                         set.status = 403
                         return errorResponse('Forbidden: Admin only', 403)
                     }
                 }
             }, (app) => 
                 app
-                .get('/admin/request', async ({query, set}: any) => {
+                .get('/admin/requests', async ({query, set}: any) => {
                     try {
                         const page = Number(query.page) || 1
                         const limit = Number(query.limit) || 10
@@ -168,6 +168,25 @@ export const borrowController = (app: Elysia) => {
                 }, {
                     query: borrowPagination
                 })
+                .post('/admin/approve/:id', async ({params, user, set}: any) => {
+                     try {
+                        const res = await approveRequest(
+                            params.id, 
+                            user.id,
+                        )
+                        return successResponse(res)
+                    } catch (error) {
+                        console.log('failed to approve request', error)
+                        set.status = 500;
+                        return errorResponse(
+                            error instanceof Error
+                            ? error.message
+                            : 'failed to approve request'
+                        );
+                    }
+                }, {
+                    params: getRequestId
+                })
                 .post('/admin/reject/:id', async ({params, user, set}: any) => {
                     try {
                         const res = await rejectRequest(
@@ -176,12 +195,12 @@ export const borrowController = (app: Elysia) => {
                         )
                         return successResponse(res)
                     } catch (error) {
-                        console.log('failed to reject requests', error)
+                        console.log('failed to reject request', error)
                         set.status = 500;
                         return errorResponse(
                             error instanceof Error
                             ? error.message
-                            : 'failed to reject requests'
+                            : 'failed to reject request'
                         );
                     }
                 })

@@ -54,7 +54,7 @@ export const itemController = (app: Elysia) => {
         beforeHandle: (ctx: any) => {
             const { user, set } = ctx
             console.log(user)
-            if (!user || user.role !== 'admin') {
+            if (!user || user.role !== 'ADMIN') {
                 set.status = 403
                 throw errorResponse(
                     "forbidden",
