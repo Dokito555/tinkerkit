@@ -15,15 +15,17 @@ enum Role {
 enum ItemStatus {
   AVAILABLE
   UNAVAILABLE
-  MAINTENANCE
 }
 
 enum BorrowStatus {
-  BORROWED
-  RETURNED
-  LATE
-  CANCELED
+  PENDING    
+  APPROVED    
+  BORROWED   
+  RETURNED   
+  REJECTED     
+  CANCELLED
 }
+
 
 model User {
   id            String         @id @default(uuid())
@@ -67,9 +69,9 @@ model BorrowedItem {
   id           String       @id @default(uuid())
   userId       String
   itemId       String
-  borrowedAt   DateTime     @default(now())
+  borrowedAt   DateTime?     @default(now())
   dueDate      DateTime
-  status       BorrowStatus @default(BORROWED)
+  status       BorrowStatus @default(PENDING)
   returnedAt   DateTime?
   durationDays Int?
   createdAt    DateTime

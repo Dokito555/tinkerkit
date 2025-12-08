@@ -1,6 +1,6 @@
 import Elysia from "elysia";
-import { borrowItem, returnItem } from "../services/borrow.service";
-import { createBorrowRequest, returnItemRequest } from "../validators/borrow.validator";
+import { checkoutItem, checkOverdue, createBorrowRequest, getAllRequests, getBorrowRequest, getUserBorrowHistory, rejectRequest, returnItem } from "../services/borrow.service";
+import { borrowPagination, createBorrowRequestRequest, getRequestId, myRequestsRequest, returnItemRequest } from "../validators/borrow.validator";
 import { errorResponse, successResponse } from "../utils/response.util";
 
 export const borrowController = (app: Elysia) => {
@@ -11,64 +11,195 @@ export const borrowController = (app: Elysia) => {
                 const {user, set} = ctx
                 console.log(user)
                 if (!user) {
-                    set.status = 403
+                    set.status = 401
                     throw errorResponse(
-                        "forbidden",
-                        403,
+                        "unauthorized",
+                        401,
                     )
                 }
             }
         }, (app) => 
             app
-            .post('/', async ({body, user, set}: any) => {
-                console.log("User from borrow:", JSON.stringify(user, null, 2)) 
-                console.log("Body:", JSON.stringify(body, null, 2))
+            // TODO: find a solution for this bullshit (remove any)
+            .post('/request', async ({body, user, set}: any) => {
                 try {
-
-                    const { id, days } = body
-                    
-                    console.log("id:", id)
-                    console.log("days:", days)
-                    console.log("userId:", user.id)
-
-                    if (!id) {
-                        set.status = 400
-                        return errorResponse("id is required", 400)
-                    }
-
-                    const res = await borrowItem(
+                    const res = await createBorrowRequest(
                         user.id, 
-                        body.id, 
+                        body.itemId, 
                         body.days
                     )
-
                     return successResponse(res)
                 } catch (error) {
+                    console.log('create request error', error)
                     set.status = 500;
                     return errorResponse(
-                        "failed to add item",
-                        500, error
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to create borrow request'
                     );
                 }
             }, {
-                body: createBorrowRequest
+                body: createBorrowRequestRequest
             }) 
-            .post('/return/:id', async ({params, user, set}: any) => {
-                console.log("user from return item: %d", user)
+            .get('/my-requests', async ({query, user, set}: any) => {
                 try {
-                    const res = await returnItem(params.id, user.id)
+                    const page = Number(query.page) || 1
+                    const limit = Number(query.limit) || 10
+                    const status = query.status
 
+                    const res = await getAllRequests(page, limit, status, user.id)
                     return successResponse(res)
                 } catch (error) {
+                    console.log('get my requests error', error)
                     set.status = 500;
                     return errorResponse(
-                        "failed to add item",
-                        500, error
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to get my borrow requests'
                     );
                 }
             }, {
-                params: returnItemRequest
+                query: myRequestsRequest
             })
+            .get('/request/:id', async ({params, user, set}: any) => {
+                try {
+                    const res = await getBorrowRequest(
+                        params.id, 
+                        user.id
+                    )
+                    return successResponse(res)
+                } catch (error) {
+                    console.log('get my request error', error)
+                    set.status = 500;
+                    return errorResponse(
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to get my request'
+                    );
+                }
+            })
+            .post('/checkout/:id', async ({params, user, set}: any) => {
+                try {
+                    const res = await checkoutItem(
+                        params.id,
+                        user.id
+                    )
+                    return successResponse(res)
+                } catch (error) {
+                    console.log('failed to checkout request', error)
+                    set.status = 500;
+                    return errorResponse(
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to checkout request'
+                    );
+                }
+            }, {
+                params: getRequestId
+            })
+            .post('/return/:id', async ({params, user, set}: any) => {
+                try {   
+                    const res = await returnItem(
+                        params.id, 
+                        user.id
+                    )
+                    return successResponse(res)
+                } catch (error) {
+                    console.log('failed to return request', error)
+                    set.status = 500;
+                    return errorResponse(
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to return request'
+                    );
+                }
+            }, {
+                params: getRequestId
+            })
+            .get('/history', async ({query, user, set}: any) => {
+                try {
+                    const page = Number(query.page) || 1
+                    const limit = Number(query.limit) || 10
+                    
+                    const res = await getUserBorrowHistory(
+                        user.id,
+                        page, 
+                        limit
+                    )
+                    return successResponse(res)
+                } catch (error) {
+                    console.log('failed to get history request', error)
+                    set.status = 500;
+                    return errorResponse(
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to get history request'
+                    );
+                }
+            }, {
+                query: borrowPagination
+            })
+            .guard({
+                beforeHandle: ({ user, set }: any) => {
+                    if (!user || user.role !== 'admin') {
+                        set.status = 403
+                        return errorResponse('Forbidden: Admin only', 403)
+                    }
+                }
+            }, (app) => 
+                app
+                .get('/admin/request', async ({query, set}: any) => {
+                    try {
+                        const page = Number(query.page) || 1
+                        const limit = Number(query.limit) || 10
+                        const status = query.status
+                        
+                        const res = await getAllRequests(page, limit, status)
+                        return successResponse(res)
+                    } catch (error) {
+                        console.log('failed to get admin requests', error)
+                        set.status = 500;
+                        return errorResponse(
+                            error instanceof Error
+                            ? error.message
+                            : 'failed to get admin requests'
+                        );
+                    }
+                }, {
+                    query: borrowPagination
+                })
+                .post('/admin/reject/:id', async ({params, user, set}: any) => {
+                    try {
+                        const res = await rejectRequest(
+                            params.id, 
+                            user.id,
+                        )
+                        return successResponse(res)
+                    } catch (error) {
+                        console.log('failed to reject requests', error)
+                        set.status = 500;
+                        return errorResponse(
+                            error instanceof Error
+                            ? error.message
+                            : 'failed to reject requests'
+                        );
+                    }
+                })
+                .get('/admin/overdue', async ({set}) => {
+                    try {
+                        const res = await checkOverdue()
+                        return successResponse(res)
+                    } catch (error) {
+                        console.log('failed to check overdue requests', error)
+                        set.status = 500;
+                        return errorResponse(
+                            error instanceof Error
+                            ? error.message
+                            : 'failed to check overdue requests'
+                        );
+                    }
+                })
+            )
         )
     )
 }

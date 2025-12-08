@@ -5,16 +5,47 @@ import { authController } from './controllers/auth.controller'
 import { itemController } from './controllers/item.controller'
 import { borrowController } from './controllers/borrow.controller'
 
+// export interface AuthUser {
+//     id: string
+//     email: string
+//     role: string
+//     createdAt: Date
+// }
+
 const app = new Elysia({ prefix: '/api' })
     .derive(async ({ cookie }) => {
         console.log("cookie:", cookie?.session?.value)
         const token = cookie?.session?.value
-        if (!token) return { user: null }
+        // if (!token) return { user: null as AuthUser | null}
+        if (!token) return { user: null}
 
         const session = await getSessionByToken(token as string)
-        return { user: session?.user ?? null }
+        // return { user: (session?.user ?? null) as AuthUser | null }
+        return { user: session?.user ?? null}
     })
-    
+    // .macro(({ onBeforeHandle }) => ({
+    //     isAuth(enabled: boolean) {
+    //         if (!enabled) return
+
+    //         onBeforeHandle(({ user, set }) => {
+    //             if (!user) {
+    //                 set.status = 401
+    //                 throw new Error('Unauthorized')
+    //             }
+    //         })
+    //     },
+    //     isAdmin(enabled: boolean) {
+    //         if (!enabled) return
+
+    //         onBeforeHandle(({ user, set }) => {
+    //             if (!user || user.role !== 'admin') {
+    //                 set.status = 403
+    //                 throw new Error('Forbidden: Admin only')
+    //             }
+    //         })
+    //     }
+    // }))
+    // .use(authPlugin)
     .use(authController)
     .use(itemController)
     .use(borrowController)

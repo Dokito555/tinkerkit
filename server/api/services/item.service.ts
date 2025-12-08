@@ -72,3 +72,45 @@ export async function getAllItems(page: number, limit: number) {
 
     return [items, total];
 }
+
+export async function itemSearchQuery(searchQuery: string, page: number, limit: number) {
+    const skip = (page - 1) * limit
+
+    const where = {
+        OR: [
+            {
+                name: {
+                    contains: searchQuery,
+                    mode: 'insensitive' as const
+                }
+            },
+            {
+                tag: {
+                    contains: searchQuery,
+                    mode: 'insensitive' as const
+                }
+            }
+        ],
+        isAvailable: true
+    }
+
+    const [items, total] = await Promise.all([
+        prisma.item.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: {
+                createdAt: 'desc'
+            }
+        }),
+        prisma.item.count({ where })
+    ])
+
+    return {
+        items,
+        total,
+        page,
+        limit,
+        totalPage: Math.ceil(total/limit)
+    }
+}
