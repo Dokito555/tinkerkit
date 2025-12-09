@@ -1,2 +1,7 @@
-User-Agent: *
-Disallow:
+User-agent: Googlebot
+Disallow: /nogooglebot/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://tinkerkit-versi-2-az58hv.teleporthq.app/sitemap.xml
