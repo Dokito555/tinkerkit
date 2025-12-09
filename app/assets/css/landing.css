@@ -1,4 +1,3 @@
-/* RESET RINGAN */
 *,
 *::before,
 *::after {
@@ -35,7 +34,6 @@ a {
   padding: 0 1.5rem;
 }
 
-/* BUTTON */
 .btn {
   border-radius: 999px;
   padding: 0.6rem 1.6rem;
@@ -61,32 +59,26 @@ a {
   color: #ffffff;
 }
 
-/* HERO SECTION */
-/* HERO SECTION */
 .hero-section {
   background: #1f3fb5;
   color: #fff;
-
-  /* tinggi minimal 1 layar */
   min-height: 100vh;
 
-  /* header di atas, konten hero di bawahnya */
   display: flex;
   flex-direction: column;
 
   padding: 1.25rem 0 2.5rem;
 }
 
-/* TOPBAR */
 .topbar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1120px;     /* sama seperti .container */
-  margin: 0 auto;         /* biar center */
-  padding: 0 24px;        /* kiri-kanan rapi */
+  max-width: 1120px;    
+  margin: 0 auto;        
+  padding: 0 24px;       
   z-index: 10;
 }
 
@@ -98,7 +90,6 @@ a {
 
 .logo-square,
 .nav-square {
- /* width: 60px; */       /* ukuran sama seperti sebelumnya*/
   height: auto;
   object-fit: contain;
   display: block;
@@ -109,7 +100,6 @@ a {
   font-size: 1.6rem;
 }
 
-/* NAV DESKTOP */
 .nav {
   display: flex;
   gap: 1.7rem;
@@ -124,9 +114,6 @@ a {
   opacity: 1;
 }
 
-
-
-/* TOMBOL NAV MOBILE (hamburger) */
 .nav-toggle {
   display: none;
   background: transparent;
@@ -136,18 +123,16 @@ a {
   cursor: pointer;
 }
 
-/* HERO GRID (pastikan ini juga ada di file-mu) */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 3.5rem;
-  flex: 1;                      /* <-- ini yang mendorong hero mengisi sisa tinggi */
+  flex: 1;                     
   margin-top: 4rem;
   align-items: center;
 }
 
 
-/* toggle nav mobile */
 .nav-toggle {
   display: none;
   background: transparent;
@@ -156,13 +141,11 @@ a {
   font-size: 1.5rem;
 }
 
-/* HERO CONTENT */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 3.5rem;
 
-  /* supaya hero ngisi sisa tinggi setelah topbar */
   flex: 1;
   margin-top: 4rem;
   align-items: center;
