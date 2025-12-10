@@ -107,48 +107,48 @@ import { reactive, ref } from 'vue'
 import '../assets/css/Login.css'
 
 const props = defineProps<{
-  status?: string
-  canResetPassword?: boolean
-  canRegister?: boolean
+    status?: string
+    canResetPassword?: boolean
+    canRegister?: boolean
 }>()
 
 const showPassword = ref(false)
 const togglePassword = () => {
-  showPassword.value = !showPassword.value
+    showPassword.value = !showPassword.value
 }
 
 const form = reactive({
-  email: '',
-  password: ''
+    email: '',
+    password: ''
 })
 
 const loading = ref(false)
 const error = ref('')
 
 const handleLogin = async () => {
-  loading.value = true
-  error.value = ''
+    loading.value = true
+    error.value = ''
 
-  try {
-    const response: any = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: {
-        email: form.email,
-        password: form.password
-      }
-    })
+    try {
+        const response: any = await $fetch('/api/auth/login', {
+        method: 'POST',
+        body: {
+            email: form.email,
+            password: form.password
+        }
+        })
 
-    if (response.success) {
-      await navigateTo('/inventory')
-    } else {
-      error.value = response.message || 'Login failed'
+        if (response.success) {
+        await navigateTo('/inventory')
+        } else {
+            error.value = response.message || 'Login failed'
+        }
+    } catch (err: any) {
+        console.error('Login error:', err)
+        error.value = err?.data?.message || err?.message || 'An error occurred during login'
+    } finally {
+        loading.value = false
     }
-  } catch (err: any) {
-    console.error('Login error:', err)
-    error.value = err?.data?.message || err?.message || 'An error occurred during login'
-  } finally {
-    loading.value = false
-  }
 }
 
 useHead({

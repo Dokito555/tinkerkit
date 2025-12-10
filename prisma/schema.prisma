@@ -18,14 +18,16 @@ enum ItemStatus {
 }
 
 enum BorrowStatus {
-  PENDING    
-  APPROVED    
-  BORROWED   
-  RETURNED   
-  REJECTED     
+  AWAITING_PAYMENT
+  PAYMENT_FAILED
+  PAID
+  PENDING
+  APPROVED
+  BORROWED
+  RETURNED
+  REJECTED
   CANCELLED
 }
-
 
 model User {
   id            String         @id @default(uuid())
@@ -69,26 +71,35 @@ model BorrowedItem {
   id           String       @id @default(uuid())
   userId       String
   itemId       String
-  borrowedAt   DateTime?     @default(now())
+  borrowedAt   DateTime?    @default(now())
   dueDate      DateTime
-  status       BorrowStatus @default(PENDING)
-  returnedAt   DateTime?
   durationDays Int?
-  createdAt    DateTime
-  updatedAt    DateTime
+  status       BorrowStatus @default(PENDING)
+
+  totalAmount Int?
+  paymentId   String? @unique
+  paymentUrl  String?
+  paymentStatus String?
+  paidAt      DateTime?
+
+  returnedAt DateTime?
+  createdAt  DateTime
+  updatedAt  DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   item Item @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
   @@index([userId])
   @@index([itemId])
+  @@index([status])
+  @@index([paymentId])
 }
 
 model BorrowedItemHistory {
-  id           String       @id @default(uuid())
+  id           String    @id @default(uuid())
   userId       String
   itemId       String
-  borrowedAt   DateTime     @default(now())
+  borrowedAt   DateTime  @default(now())
   dueDate      DateTime
   returnedAt   DateTime?
   durationDays Int?

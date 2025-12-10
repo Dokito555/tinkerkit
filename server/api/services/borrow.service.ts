@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client/extension"
 import { status } from "elysia"
 import prisma from "~~/server/db/prisma"
+import { notifyAdminNewCheckout } from "./whatsapp.service"
+import { createXenditInvoice } from "./xendit.service"
+import { CreateInvoiceRequest } from "xendit-node/invoice/models"
 
 export async function createBorrowRequest(userId: string, itemId: string, days: number) {
     console.log("createBorrowRequest called with:", { userId, itemId, days })
@@ -160,10 +163,26 @@ export async function approveRequest(requestId: string, adminId: string) {
             throw new Error('item no longer available')
         }
 
+        // TODO: ask price logic and remove nullable price value
+        const totalAmount = request.item.price * request.durationDays!
+
+        const invoice = await createXenditInvoice({
+            externalId: `BORROW-${requestId}`,
+            amount: totalAmount,
+            // TODO: payer email
+            description: `Rental: ${request.item.name} for ${request.durationDays} days`,
+            successRedirectUrl: `${process.env.BASE_URL}/payment/success?id=${requestId}`,
+            failureRedirectUrl: `${process.env.BASE_URL}/payment/failed?id=${requestId}`
+        })
+
         const approved = await tx.borrowedItem.update({
             where: { id: requestId },
             data: {
-                status: 'APPROVED',
+                status: 'AWAITING_PAYMENT',
+                totalAmount,
+                paymentId: invoice.id,
+                paymentUrl: invoice.invoiceUrl,
+                paymentStatus: invoice.status,
                 updatedAt: new Date()
             },
             include: {
@@ -246,9 +265,14 @@ export async function checkoutItem(requestId: string, userId: string) {
             throw new Error('request not found')
         }
 
-        if (request.status !== 'APPROVED') {
-            throw new Error('request must be approved before checkout')
+        // TODO: what
+        if (request.status !== 'PAID') {
+            throw new Error('payment required before checkout')
         }
+
+        // if (request.status !== 'APPROVED') {
+        //     throw new Error('request must be approved before checkout')
+        // }
 
         if (request.userId !== userId) {
             throw new Error('not authrorized to checkout this item')
@@ -452,6 +476,51 @@ export async function getUserBorrowHistory(userId: string, page: number = 1, lim
         limit,
         totalPages: Math.ceil(total/limit)
     }
+}
+
+export async function handlePaymentWebhook(invoiceId: string, status: string) {
+    const borrowRequest = await prisma.borrowedItem.findUnique({
+        where: {
+            paymentId: invoiceId
+        },
+        include: {
+            item: true,
+            user: true
+        }
+    })
+
+    if (!borrowRequest) {
+        throw new Error('borrow request not found for this payment')
+    }
+
+    if (status === 'PAID' || status === 'SETTLED') {
+        await prisma.borrowedItem.update({
+            where: {
+                id: borrowRequest.id
+            },
+            data: {
+                status: 'PAID',
+                paymentStatus: status,
+                paidAt: new Date(),
+                updatedAt: new Date()
+            }
+        })
+
+        await notifyAdminNewCheckout(borrowRequest)
+    } else if (status === 'EXPIRED') {
+        await prisma.borrowedItem.update({
+            where: {
+                id: borrowRequest.id
+            },
+            data: {
+                status: 'PAYMENT_FAILED',
+                paymentStatus: status,
+                updatedAt: new Date()
+            }
+        })
+    }
+
+    return borrowRequest
 }
 
 export async function renewal() {}

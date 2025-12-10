@@ -139,6 +139,35 @@ export const borrowController = (app: Elysia) => {
             }, {
                 query: borrowPagination
             })
+            .get('/payment-status/:id', async ({ params, user, set }: any) => {
+                if (!user) {
+                    set.status = 401
+                    return errorResponse(
+                       'unauthorized',
+                       401
+                    )
+                }
+
+                try {
+                    const request = await getBorrowRequest(params.id, user.id)
+
+                    return successResponse({
+                        status: request.status,
+                        paymentUrl: request.paymentUrl,
+                        paymentStatus: request.paymentStatus,
+                        totalAmount: request.totalAmount,
+                        paidAt: request.paidAt
+                    })
+                } catch (error) {
+                    return errorResponse(
+                        error instanceof Error
+                        ? error.message
+                        : 'failed to get borrow request'
+                    );
+                }
+            }, {
+                params: getRequestId
+            })
             .guard({
                 beforeHandle: ({ user, set }: any) => {
                     if (!user || user.role !== 'ADMIN') {

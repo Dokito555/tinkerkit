@@ -19,8 +19,10 @@
     "bcrypt": "^6.0.0",
     "elysia": "^1.4.16",
     "nuxt": "^4.2.1",
+    "twilio": "^5.10.7",
     "vue": "^3.5.24",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "xendit-node": "^7.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
