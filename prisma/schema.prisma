@@ -3,8 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  // url = "postgresql://postgres:postgres123@localhost:5432/tinkerkit?schema=public"
+  provider = "mysql"
 }
 
 enum Role {
