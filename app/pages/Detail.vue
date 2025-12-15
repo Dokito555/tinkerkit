@@ -16,9 +16,8 @@
         </nav>
 
         <button class="header__avatar" type="button" aria-label="User menu">
-            <img :src="logoHeader" alt="User Avatar" />
+          <img :src="logoHeader" alt="User Avatar" />
         </button>
-
       </div>
     </header>
 
@@ -33,25 +32,33 @@
             <div class="left__statusCard">
               <div class="left__status">
                 {{ product.available ? 'Status Available' : 'Status Unavailable' }}
-                </div>
+              </div>
 
               <div class="left__ctaWrap">
-                <button class="btn-primary" type="button" :disabled="!product.available">
-                Borrow Now
+                <button
+                  class="btn-primary"
+                  type="button"
+                  :disabled="!canBorrow"
+                  @click="submitLoan"
+                >
+                  Borrow Now
                 </button>
               </div>
 
-              <div v-if="selectedLabel" class="left__selected">
-                Selected: <strong>{{ selectedLabel }}</strong>
+              <div v-if="rangeLabel" class="left__selected">
+                Selected: <strong>{{ rangeLabel }}</strong>
+              </div>
+
+              <div v-if="rangeConflict" class="left__selected" style="color:#ef4444;">
+                Range bentrok dengan tanggal yang sudah booked.
               </div>
             </div>
-
           </aside>
 
           <!-- RIGHT -->
           <section class="right">
             <article class="card">
-             <h1 class="title">{{ product.name }}</h1>
+              <h1 class="title">{{ product.name }}</h1>
               <p class="subtitle">{{ product.category }}</p>
               <p class="desc">{{ product.desc }}</p>
             </article>
@@ -82,18 +89,26 @@
                   :class="{
                     'day--muted': !cell.inMonth,
                     'day--today': cell.isToday,
-                    'day--selected': cell.isSelected
+
+                    'day--past': cell.isPast,
+                    'day--booked': cell.isBooked,
+
+                    'day--range': cell.isInRange,
+                    'day--start': cell.isStart,
+                    'day--end': cell.isEnd
                   }"
-                  :disabled="!cell.inMonth"
-                  @click="selectDate(cell)"
+                  :disabled="!cell.inMonth || cell.isPast || cell.isBooked"
+                  @click="pickRange(cell)"
                 >
                   {{ cell.day }}
                 </button>
               </div>
 
               <div class="calendar__hint">
-                <span class="dot dot--today"></span> Today
-                <span class="dot dot--selected"></span> Selected
+                <span class="dot dot--past"></span> Past
+                <span class="dot dot--booked"></span> Booked
+                <span class="dot dot--free"></span> Available
+                <span class="dot dot--range"></span> Selected
               </div>
             </article>
           </section>
@@ -162,7 +177,6 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-/** asset tetap */
 const logoHeader = '/app_icon.svg'
 const logoFooter = '/app_icon.svg'
 
@@ -175,42 +189,104 @@ const iconEmail   = '/Detail/icbaselineemail1328-6104.svg'
 const iconDiscord = '/Detail/icbaselinediscord1330-rfu.svg'
 const iconWa      = '/Detail/riwhatsappfill1332-9z0o.svg'
 
+
 const product = computed(() => {
   const q = route.query
   return {
-    id: Number(q.id || 0),
+    id: Number(route.params.id || q.id || 0),
     name: String(q.name || 'Leonardo R3'),
     category: String(q.category || 'Microcontroller & Boards'),
     img: String(q.img || '/Detail/image111340-ssq-400h.png'),
     available: q.available === '1' || q.available === 1 || q.available === true,
-    desc: String(q.desc || '')
+    desc: String(
+      q.desc ||
+        'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor.'
+    ),
   }
 })
 
-/** kalender (tetap) */
+
 const daysOfWeek = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 const current = ref(new Date())
-const selected = ref(null)
+
+const startDate = ref(null) 
+const endDate = ref(null)   
+
+const bookedRanges = ref([
+  { start: '2025-12-18', end: '2025-12-20' },
+  { start: '2025-12-25', end: '2025-12-26' }
+])
 
 function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1) }
-function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0) }
+function mondayIndex(jsDay) { return (jsDay + 6) % 7 }
 
+function startOfDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
 function isSameDate(a, b) {
   if (!a || !b) return false
   return a.getFullYear() === b.getFullYear()
     && a.getMonth() === b.getMonth()
     && a.getDate() === b.getDate()
 }
+function toYMD(d) {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+function isPastDate(d) {
+  return startOfDay(d).getTime() < startOfDay(new Date()).getTime()
+}
+function isWithin(date, startYMD, endYMD) {
+  const x = toYMD(date)
+  return x >= startYMD && x <= endYMD
+}
+function isBookedDate(d) {
+  return bookedRanges.value.some(r => isWithin(d, r.start, r.end))
+}
 
-function mondayIndex(jsDay) { return (jsDay + 6) % 7 }
+function isInSelectedRange(d) {
+  if (!startDate.value) return false
+  if (!endDate.value) return isSameDate(d, startDate.value)
+
+  const a = toYMD(startDate.value)
+  const b = toYMD(endDate.value)
+  const min = a < b ? a : b
+  const max = a < b ? b : a
+  return isWithin(d, min, max)
+}
+
+function isStart(d) { return startDate.value ? isSameDate(d, startDate.value) : false }
+function isEnd(d) { return endDate.value ? isSameDate(d, endDate.value) : false }
 
 const monthLabel = computed(() => {
   return current.value.toLocaleString('en-US', { month: 'long', year: 'numeric' })
 })
 
-const selectedLabel = computed(() => {
-  if (!selected.value) return ''
-  return selected.value.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+const rangeLabel = computed(() => {
+  if (!startDate.value) return ''
+  const from = startDate.value.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+  if (!endDate.value) return `From ${from}`
+  const to = endDate.value.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+  return `From ${from} — To ${to}`
+})
+
+const rangeConflict = computed(() => {
+  if (!startDate.value || !endDate.value) return false
+  const a = toYMD(startDate.value)
+  const b = toYMD(endDate.value)
+  const min = a < b ? a : b
+  const max = a < b ? b : a
+
+  return bookedRanges.value.some(r => !(r.end < min || r.start > max))
+})
+
+const canBorrow = computed(() => {
+  if (!product.value.available) return false
+  if (!startDate.value || !endDate.value) return false
+  if (rangeConflict.value) return false
+  return true
 })
 
 const calendarCells = computed(() => {
@@ -227,14 +303,24 @@ const calendarCells = computed(() => {
     d.setDate(startGrid.getDate() + i)
 
     const inMonth = d.getMonth() === base.getMonth()
+    const past = isPastDate(d)
+    const booked = isBookedDate(d)
+
     cells.push({
       date: d,
       day: d.getDate(),
       inMonth,
       isToday: isSameDate(d, today),
-      isSelected: selected.value ? isSameDate(d, selected.value) : false,
+
+      isPast: past,
+      isBooked: booked,
+
+      isInRange: isInSelectedRange(d),
+      isStart: isStart(d),
+      isEnd: isEnd(d)
     })
   }
+
   return cells
 })
 
@@ -243,16 +329,55 @@ function prevMonth() {
   d.setMonth(d.getMonth() - 1)
   current.value = d
 }
-
 function nextMonth() {
   const d = new Date(current.value)
   d.setMonth(d.getMonth() + 1)
   current.value = d
 }
 
-function selectDate(cell) {
+function pickRange(cell) {
   if (!cell.inMonth) return
-  selected.value = new Date(cell.date)
+  if (cell.isPast) return
+  if (cell.isBooked) return
+
+  const picked = new Date(cell.date)
+
+  if (!startDate.value || (startDate.value && endDate.value)) {
+    startDate.value = picked
+    endDate.value = null
+    return
+  }
+
+  // set end
+  endDate.value = picked
+
+  if (startDate.value && endDate.value) {
+    if (startDate.value.getTime() > endDate.value.getTime()) {
+      const tmp = startDate.value
+      startDate.value = endDate.value
+      endDate.value = tmp
+    }
+  }
+}
+
+function submitLoan() {
+  if (!canBorrow.value) return
+
+  const payload = {
+    productId: product.value.id,
+    name: product.value.name,
+    category: product.value.category,
+    img: product.value.img,
+    from: toYMD(startDate.value),
+    to: toYMD(endDate.value),
+    createdAt: new Date().toISOString()
+  }
+
+  const old = JSON.parse(localStorage.getItem('myloans') || '[]')
+  old.push(payload)
+  localStorage.setItem('myloans', JSON.stringify(old))
+
+  navigateTo('/myloans')
 }
 </script>
 
@@ -293,7 +418,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .header__avatar{
   border-radius:10px;
-  background: transparent;  
+  background: transparent;
   padding:0;
   border:none;
 }
@@ -316,12 +441,18 @@ img { max-width: 100%; height: auto; display: block; }
 .left__ctaWrap { display: flex; }
 .left__selected { margin-top: 12px; font-size: 13px; color: #374151; }
 
-.btn-primary { width: 100%; height: 52px; border-radius: 12px; background: #1e40af; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
-.btn-primary:disabled{background:#9ca3af; cursor:not-allowed;}
+.btn-primary {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  background: #1e40af;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.btn-primary:disabled{ background:#9ca3af; cursor:not-allowed; }
 .btn-primary:hover { filter: brightness(1.05); }
-
-.left__preview { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06); }
-.left__previewImg { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
 
 .card--calendar { padding: 16px; }
 .calendar__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -349,7 +480,7 @@ img { max-width: 100%; height: auto; display: block; }
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: 12px;
-  background: #f9fafb;
+  background: #f9fafb;           
   border: 1px solid #eef2f7;
   display: grid;
   place-items: center;
@@ -371,9 +502,26 @@ img { max-width: 100%; height: auto; display: block; }
   border-color: rgba(30, 64, 175, 0.18);
 }
 
-.day--selected{
-  background: rgba(30, 64, 175, 0.18);
-  border-color: rgba(30, 64, 175, 0.35);
+.day--past{
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #ef4444;
+}
+
+.day--booked{
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.30);
+  color: #059669;
+}
+
+.day--range{
+  background: rgba(30, 64, 175, 0.14);
+  border-color: rgba(30, 64, 175, 0.26);
+}
+.day--start,
+.day--end{
+  background: rgba(30, 64, 175, 0.24);
+  border-color: rgba(30, 64, 175, 0.40);
 }
 
 .calendar__hint{
@@ -383,12 +531,15 @@ img { max-width: 100%; height: auto; display: block; }
   margin-top: 12px;
   font-size: 12px;
   color: #6b7280;
+  flex-wrap: wrap;
 }
 .dot{
   width: 10px; height: 10px; border-radius: 999px; display: inline-block;
 }
-.dot--today{ background: rgba(30, 64, 175, 0.35); }
-.dot--selected{ background: rgba(30, 64, 175, 0.6); }
+.dot--past{ background: rgba(239, 68, 68, 0.6); }
+.dot--booked{ background: rgba(16, 185, 129, 0.75); }
+.dot--free{ background: rgba(107, 114, 128, 0.6); }
+.dot--range{ background: rgba(30, 64, 175, 0.6); }
 
 .footer { margin-top: 28px; background: #1e40af; color: #fff; padding: 40px 0; }
 .footer__inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 26px; }
