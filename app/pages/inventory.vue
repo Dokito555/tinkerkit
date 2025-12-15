@@ -14,7 +14,10 @@
           <a href="#" class="nav__link">FAQ</a>
         </nav>
 
-        <button class="header__avatar" type="button" aria-label="User menu"></button>
+        <button class="header__avatar" type="button" aria-label="User menu">
+        <img :src="assets.headerLogo" alt="User Avatar"
+        />
+</button>
       </div>
     </header>
 
@@ -159,8 +162,8 @@ import { computed, ref } from 'vue'
 const assets = {
   footerBg: '/Inventory/rectangle4031410-l8vg-1500w.png',
 
-  headerLogo: '/Inventory/rectangle3941415-e7l4-200h.png',
-  footerLogo: '/Inventory/rectangle3941428-di2-200h.png',
+  headerLogo: '/app_icon.svg',
+  footerLogo: '/app_icon.svg',
 
   ig: '/Inventory/vector1434-hrt.svg',
   tw: '/Inventory/vector1438-qg5en.svg',
@@ -241,7 +244,7 @@ img{ display:block; max-width:100%; height:auto; }
   position:relative;
 }
 .brand{ display:flex; align-items:center; gap:12px; }
-.brand__logo{ width:42px; height:42px; border-radius:10px; object-fit:cover; background:#d9d9d9; }
+.brand__logo{ border-radius:20px; object-fit:cover; }
 .brand__name{ color:#fff; font-weight:700; font-size:24px; line-height:1; }
 
 .nav{
@@ -257,9 +260,10 @@ img{ display:block; max-width:100%; height:auto; }
 .nav__link.is-active{ text-decoration:underline; }
 
 .header__avatar{
-  width:42px; height:42px;
   border-radius:10px;
-  background:#d9d9d9;
+  background: transparent;  
+  padding:0;
+  border:none;
 }
 
 .main{ flex:1; padding:28px 0 56px; }

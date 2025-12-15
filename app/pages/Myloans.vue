@@ -14,7 +14,10 @@
           <a href="#" class="nav__link">FAQ</a>
         </nav>
 
-        <button class="header__avatar" type="button" aria-label="User menu"></button>
+        <button class="header__avatar" type="button" aria-label="User menu">
+            <img :src="logoHeader" alt="User Avatar" />
+        </button>
+
       </div>
     </header>
 
@@ -156,8 +159,8 @@ function isActive(path) {
 }
 
 
-const logoHeader = '/Myloans/rectangle394i112-1y8-200h.png'
-const logoFooter = '/Myloans/rectangle394i112-2fh-200h.png'
+const logoHeader = '/app_icon.svg'
+const logoFooter = '/app_icon.svg'
 
 const iconIg      = '/Myloans/vectori112-gyg.svg'
 const iconTw      = '/Myloans/vectori112-mlg7.svg'
@@ -204,7 +207,7 @@ img { max-width: 100%; height: auto; display: block; }
   gap: 16px;
 }
 .brand{ display:flex; align-items:center; gap:12px; flex:0 0 auto; }
-.brand__logo{ width:42px; height:42px; border-radius:10px; object-fit:cover; }
+.brand__logo{ border-radius:20px; object-fit:cover; }
 .brand__name{ color:#fff; font-weight:700; font-size:24px; line-height:1; white-space:nowrap; }
 
 .nav{
@@ -220,11 +223,12 @@ img { max-width: 100%; height: auto; display: block; }
 .nav__link:hover{ opacity:1; text-decoration:underline; }
 
 .header__avatar{
-  width:42px; height:42px;
   border-radius:10px;
-  background:#d9d9d9;
-  flex:0 0 auto;
+  background: transparent;  
+  padding:0;
+  border:none;
 }
+
 
 .main { padding: 28px 0 36px; }
 

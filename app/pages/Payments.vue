@@ -14,7 +14,10 @@
           <RouterLink to="/faq" class="nav__link">FAQ</RouterLink>
         </nav>
 
-        <button class="header__avatar" type="button" aria-label="User menu"></button>
+        <button class="header__avatar" type="button" aria-label="User menu">
+            <img :src="logoHeader" alt="User Avatar" />
+        </button>
+
       </div>
     </header>
 
@@ -172,8 +175,8 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const isActive = (path) => route.path === path;
 
-const logoHeader = "/Payments/rectangle394i145-vesk-200h.png";
-const logoFooter = "/Payments/rectangle394i147-26an-200h.png";
+const logoHeader = "/app_icon.svg";
+const logoFooter = "/app_icon.svg";
 
 const iconIg = "/Payments/vectori147-emx4.svg";
 const iconTw = "/Payments/vectori147-gg3.svg";
@@ -202,7 +205,7 @@ img{max-width:100%;height:auto;display:block}
   position:relative;height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px;
 }
 .brand{display:flex;align-items:center;gap:12px;flex:0 0 auto;}
-.brand__logo{width:42px;height:42px;border-radius:10px;object-fit:cover;}
+.brand__logo{ border-radius:20px; object-fit:cover; }
 .brand__name{color:#fff;font-weight:700;font-size:24px;line-height:1;white-space:nowrap;}
 .nav{
   position:absolute;left:50%;transform:translateX(-50%);
@@ -210,7 +213,12 @@ img{max-width:100%;height:auto;display:block}
 }
 .nav__link{color:#fff;font-weight:600;font-size:14px;opacity:.95;}
 .nav__link:hover{opacity:1;text-decoration:underline;}
-.header__avatar{width:42px;height:42px;border-radius:10px;background:#d9d9d9;flex:0 0 auto;}
+.header__avatar{
+  border-radius:10px;
+  background: transparent;  
+  padding:0;
+  border:none;
+}
 
 .main{padding:28px 0 36px;}
 
