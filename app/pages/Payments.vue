@@ -51,7 +51,7 @@
               <div class="side__section">
                 <div class="side__title">Settings</div>
                 <RouterLink
-                  to="/settings"
+                  to="/payments"
                   class="side__item"
                   :class="{ 'is-active': isActive('/settings') }"
                 >

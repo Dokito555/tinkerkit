@@ -9,7 +9,7 @@
         </div>
 
         <nav class="nav">
-          <a href="#" class="nav__link">Inventory</a>
+          <a href="/inventory" class="nav__link">Inventory</a>
           <a href="#" class="nav__link">About us</a>
           <a href="#" class="nav__link">Membership</a>
           <a href="#" class="nav__link">FAQ</a>

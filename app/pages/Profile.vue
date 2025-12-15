@@ -9,9 +9,9 @@
 
         <nav class="nav">
           <RouterLink to="/inventory" class="nav__link">Inventory</RouterLink>
-          <RouterLink to="/about" class="nav__link">About us</RouterLink>
-          <RouterLink to="/membership" class="nav__link">Membership</RouterLink>
-          <RouterLink to="/faq" class="nav__link">FAQ</RouterLink>
+          <RouterLink to="#about" class="nav__link">About us</RouterLink>
+          <RouterLink to="#membership" class="nav__link">Membership</RouterLink>
+          <RouterLink to="#faq" class="nav__link">FAQ</RouterLink>
         </nav>
 
         <button class="header__avatar" type="button" aria-label="User menu">
