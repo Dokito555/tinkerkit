@@ -170,7 +170,7 @@ const items = [
     img: '@/assets/inventory/arduino-1.png'
   },
   {
-    name: 'Leonardo R3',
+    name: 'Leonardo R4',
     category: 'Microcontroller & Boards',
     available: false,
     img: '@/assets/inventory/arduino-1.png'
