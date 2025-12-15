@@ -38,10 +38,7 @@
                 Selected: <strong>{{ selectedLabel }}</strong>
               </div>
             </div>
-
-            <div class="left__preview">
-              <img :src="previewImage" alt="Preview" class="left__previewImg" />
-            </div>
+            
           </aside>
 
           <!-- RIGHT -->

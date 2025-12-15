@@ -1,157 +1,176 @@
 <template>
-  <div class="inventory-page">
-    <!-- ================= NAVBAR ================= -->
-    <header class="navbar">
-      <div class="nav-inner">
-        <div class="nav-left">
-          <div class="logo-box">
-            <!-- <img src="@/assets/Rectangle-391.svg" alt="TinkerKit" /> -->
-          </div>
-          <span class="logo-text">TinkerKit</span>
+  <div class="page">
+    <header class="header">
+      <div class="container header__inner">
+        <div class="brand">
+          <img :src="assets.headerLogo" class="brand__logo" alt="TinkerKit" />
+          <span class="brand__name">TinkerKit</span>
         </div>
 
-        <nav class="nav-menu">
-          <a href="#inventory" class="nav-link active">Inventory</a>
-          <a href="#about" class="nav-link">About us</a>
-          <a href="#membership" class="nav-link">Membership</a>
-          <a href="#faq" class="nav-link">FAQ</a>
+        <nav class="nav">
+          <a href="#" class="nav__link is-active">Inventory</a>
+          <a href="#" class="nav__link">About us</a>
+          <a href="#" class="nav__link">Membership</a>
+          <a href="#" class="nav__link">FAQ</a>
         </nav>
 
-        <div class="nav-right-square"></div>
+        <button class="header__avatar" type="button" aria-label="User menu"></button>
       </div>
     </header>
 
-    <!-- ================= CONTENT ================= -->
-    <main class="inventory-main">
-      <div class="inventory-inner">
+    <main class="main">
+      <div class="container inventory-layout">
+        <aside class="side">
+          <div class="side__card">
+            <div class="side__section">
+              <div class="side__title">Category</div>
 
-        <!-- ========== SIDEBAR FILTER ========== -->
-        <aside class="filter-sidebar">
-          <div class="filter-card">
-            <h3 class="filter-title">Category</h3>
-            <ul class="filter-list">
-              <li v-for="cat in categories" :key="cat">
-                <label class="filter-item">
-                  <span>{{ cat }}</span>
-                  <span class="filter-checkbox"></span>
-                </label>
-              </li>
-            </ul>
+              <ul class="check-list">
+                <li v-for="cat in categories" :key="cat">
+                  <label class="check-item">
+                    <span class="check-text">{{ cat }}</span>
 
-            <h3 class="filter-title filter-title-spaced">Availability</h3>
-            <ul class="filter-list">
-              <li>
-                <label class="filter-item">
-                  <span>Available Now</span>
-                  <span class="filter-checkbox"></span>
-                </label>
-              </li>
-            </ul>
+                    <input
+                      class="check-input"
+                      type="checkbox"
+                      :value="cat"
+                      v-model="selectedCategories"
+                    />
+                    <span class="check-box" aria-hidden="true"></span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="side__section">
+              <div class="side__title">Availability</div>
+
+              <label class="check-item">
+                <span class="check-text">Available Now</span>
+
+                <input class="check-input" type="checkbox" v-model="availableOnly" />
+                <span class="check-box" aria-hidden="true"></span>
+              </label>
+            </div>
           </div>
         </aside>
 
-        <!-- ========== LIST + SEARCH ========== -->
-        <section class="inventory-content">
-          <!-- search bar -->
-          <div class="search-bar-wrapper">
-            <div class="search-bar">
-              <span class="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Search"
-                v-model="search"
-              />
+        <section class="content">
+          <div class="search-card">
+            <div class="search">
+              <img :src="assets.searchIcon" class="search-ico" alt="" />
+              <input v-model="search" type="text" placeholder="Search" />
             </div>
           </div>
 
-          <!-- product grid -->
-          <div class="card-grid">
-            <article
-              v-for="(item, index) in filteredItems"
-              :key="index"
-              class="item-card"
-            >
-              <div class="item-img-wrap">
-                <!-- ganti src sesuai aset kamu -->
+          <div class="grid">
+            <article v-for="item in filteredItems" :key="item.id" class="item-card">
+              <div class="item-img">
                 <img :src="item.img" :alt="item.name" />
               </div>
+
               <div class="item-info">
                 <h4 class="item-name">{{ item.name }}</h4>
                 <p class="item-category">{{ item.category }}</p>
-                <p
-                  class="item-status"
-                  :class="{ 'item-status-unavailable': !item.available }"
-                >
+                <p class="item-status" :class="{ off: !item.available }">
                   {{ item.available ? 'Available Now' : 'Unavailable' }}
                 </p>
               </div>
+
+              <button class="btn" :disabled="!item.available" @click="requestItem(item)">
+                Request
+              </button>
             </article>
+
+            <div v-if="filteredItems.length === 0" class="empty">
+              No items found.
+            </div>
           </div>
         </section>
       </div>
     </main>
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <!-- left -->
-        <div class="footer-left">
-          <div class="footer-logo-row">
-            <div class="footer-logo-box">
-              <!-- <img src="@/assets/Rectangle-391.svg" alt="TinkerKit" /> -->
-            </div>
-            <div class="footer-logo-text">TinkerKit</div>
-          </div>
-          <p class="footer-tagline">One Place for All Your IoT Device Needs.</p>
+    <footer class="footer">
+      <img :src="assets.footerBg" alt="" class="footer__bg" />
 
-          <div class="footer-social">
-            <!-- ganti src icon sesuai aset kamu -->
-            <!-- <img src="@/assets/icon-instagram.svg" alt="Instagram" />
-            <img src="@/assets/icon-twitter.svg" alt="Twitter" />
-            <img src="@/assets/icon-email.svg" alt="Email" />
-            <img src="@/assets/icon-discord.svg" alt="Discord" />
-            <img src="@/assets/icon-whatsapp.svg" alt="WhatsApp" /> -->
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <div class="brand brand--footer">
+            <img :src="assets.footerLogo" class="brand__logo" alt="TinkerKit" />
+            <span class="brand__name">TinkerKit</span>
+          </div>
+
+          <p class="footer__tagline">One Place for All Your IoT Device Needs.</p>
+
+          <div class="social">
+            <a href="#" class="social__btn" aria-label="Instagram">
+              <img :src="assets.ig" alt="" />
+            </a>
+            <a href="#" class="social__btn" aria-label="Twitter">
+              <img :src="assets.tw" alt="" />
+            </a>
+            <a href="#" class="social__btn" aria-label="Email">
+              <img :src="assets.email" alt="" />
+            </a>
+            <a href="#" class="social__btn" aria-label="Discord">
+              <img :src="assets.discord" alt="" />
+            </a>
+            <a href="#" class="social__btn" aria-label="WhatsApp">
+              <img :src="assets.wa" alt="" />
+            </a>
           </div>
         </div>
 
-        <!-- middle columns -->
-        <div class="footer-columns">
-          <div class="footer-col">
-            <h4>Overview</h4>
+        <div class="footer__links">
+          <div class="footer__col">
             <a href="#">Home</a>
             <a href="#">Inventory</a>
             <a href="#">About Date</a>
             <a href="#">Membership</a>
             <a href="#">FAQ</a>
           </div>
-          <div class="footer-col">
-            <h4>User</h4>
+          <div class="footer__col">
             <a href="#">Profile</a>
             <a href="#">Borrow Date</a>
             <a href="#">Due Date</a>
           </div>
-          <div class="footer-col">
-            <h4>Our Location</h4>
+          <div class="footer__col footer__loc">
+            <div class="footer__locTitle">Our Location</div>
             <p>
-              Jl. Pendidikan No.15, Cibiru<br />
-              Wetan, Kec. Cileunyi,<br />
-              Kabupaten Bandung, Jawa<br />
-              Barat 40625
+              Jl. Pendidikan No.15, Cibiru Wetan, Kec. Cileunyi, Kabupaten Bandung,
+              Jawa Barat 40625
             </p>
           </div>
         </div>
-      </div>
 
-      <div class="footer-bottom">
-        <span>© 2025 TinkerKit</span>
-        <a href="#" class="footer-privacy">Privacy Policy</a>
+        <div class="footer__bottom">
+          <span>Ⓒ 2025 TinkerKit</span>
+          <a href="#" class="footer__privacy">Privacy Policy</a>
+        </div>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-// data dummy, bisa kamu ganti dari API nanti
+import { computed, ref } from 'vue'
+
+
+const assets = {
+  footerBg: '/Inventory/rectangle4031410-l8vg-1500w.png',
+
+  headerLogo: '/Inventory/rectangle3941415-e7l4-200h.png',
+  footerLogo: '/Inventory/rectangle3941428-di2-200h.png',
+
+  ig: '/Inventory/vector1434-hrt.svg',
+  tw: '/Inventory/vector1438-qg5en.svg',
+  email: '/Inventory/icbaselineemail1439-cko4.svg',
+  discord: '/Inventory/icbaselinediscord1441-406q.svg',
+  wa: '/Inventory/riwhatsappfill1443-1d7a.svg',
+
+  searchIcon: '/Inventory/weuisearchfilled1479-2wgv.svg',
+}
+
 const categories = [
   'Microcontrollers & Boards',
   'Sensors & Modules',
@@ -159,431 +178,254 @@ const categories = [
   'Networking & Connectivity',
   'Tools',
   'Power & Batteries',
-  'Finished Devices'
-];
+  'Finished Devices',
+]
 
 const items = [
-  {
-    name: 'Leonardo R3',
-    category: 'Microcontroller & Boards',
-    available: true,
-    img: '@/assets/inventory/arduino-1.png'
-  },
-  {
-    name: 'Leonardo R4',
-    category: 'Microcontroller & Boards',
-    available: false,
-    img: '@/assets/inventory/arduino-1.png'
-  },
-  {
-    name: 'Leonardo R3',
-    category: 'Microcontroller & Boards',
-    available: true,
-    img: '@/assets/inventory/arduino-1.png'
-  },
-  {
-    name: 'Leonardo R3',
-    category: 'Microcontroller & Boards',
-    available: true,
-    img: '@/assets/inventory/arduino-1.png'
-  },
-  // kamu bisa lanjutkan sendiri sampai mirip jumlah kartu di desain
-];
+  { id: 1, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image111485-6wwn-200h.png' },
+  { id: 2, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: false, img: '/Inventory/image101492-b7t-200h.png' },
+  { id: 3, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image101499-i4i8-200h.png' },
 
-import { computed, ref } from 'vue';
+  { id: 4, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101508-dwdf-200h.png' },
+  { id: 5, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101516-cjmo-200h.png' },
+  { id: 6, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101524-xxwo-200h.png' },
+]
 
-const search = ref('');
+const search = ref('')
+const selectedCategories = ref([])
+const availableOnly = ref(false)
 
 const filteredItems = computed(() => {
-  if (!search.value) return items;
-  const s = search.value.toLowerCase();
-  return items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(s) ||
-      item.category.toLowerCase().includes(s)
-  );
-});
+  let list = items
+
+  if (selectedCategories.value.length) {
+    list = list.filter((it) => selectedCategories.value.includes(it.category))
+  }
+  if (availableOnly.value) {
+    list = list.filter((it) => it.available)
+  }
+
+  const q = search.value.trim().toLowerCase()
+  if (q) {
+    list = list.filter(
+      (it) => it.name.toLowerCase().includes(q) || it.category.toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+function requestItem(item) {
+  alert(`Request: ${item.name}`)
+}
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+.page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#f9fafb;
+  color:#111827;
+  font-family:Poppins, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.container{ width:100%; max-width:1200px; margin:0 auto; padding:0 20px; }
+img{ display:block; max-width:100%; height:auto; }
 
-.inventory-page {
-  min-height: 100vh;
-  background: #f3f4f6;
-  display: flex;
-  flex-direction: column;
+.header{ background:#1e40af; position:sticky; top:0; z-index:20; }
+.header__inner{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  position:relative;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand__logo{ width:42px; height:42px; border-radius:10px; object-fit:cover; background:#d9d9d9; }
+.brand__name{ color:#fff; font-weight:700; font-size:24px; line-height:1; }
+
+.nav{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:32px;
+  white-space:nowrap;
+}
+.nav__link{ color:#fff; font-weight:600; font-size:14px; opacity:.95; }
+.nav__link:hover{ opacity:1; text-decoration:underline; }
+.nav__link.is-active{ text-decoration:underline; }
+
+.header__avatar{
+  width:42px; height:42px;
+  border-radius:10px;
+  background:#d9d9d9;
 }
 
-/* ============ NAVBAR ============ */
-.navbar {
-  background: #1f3fb5;
-  color: #fff;
-  padding: 18px 40px;
+.main{ flex:1; padding:28px 0 56px; }
+.inventory-layout{
+  display:grid;
+  grid-template-columns: 323px 1fr;
+  gap:24px;
+  align-items:start;
 }
 
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.side__card{
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 8px 18px rgba(17,24,39,.06);
+}
+.side__section{ margin-bottom:22px; }
+.side__title{ font-size:14px; font-weight:700; margin-bottom:12px; }
+
+.check-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.check-item{ display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
+.check-text{ font-size:13px; color:#4b5563; }
+
+.check-input{ position:absolute; opacity:0; pointer-events:none; }
+.check-box{
+  width:16px; height:16px;
+  border-radius:4px;
+  border:1.5px solid #d1d5db;
+  background:#fff;
+  display:inline-grid;
+  place-items:center;
+  transition:.15s ease;
+}
+.check-input:checked + .check-box{
+  background:#1e40af;
+  border-color:#1e40af;
+}
+.check-input:checked + .check-box::after{
+  content:"";
+  width:8px; height:4px;
+  border-left:2px solid #fff;
+  border-bottom:2px solid #fff;
+  transform:rotate(-45deg);
+  margin-top:-1px;
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.content{ display:flex; flex-direction:column; gap:18px; }
+.search-card{
+  background:#fff;
+  border-radius:16px;
+  padding:12px 14px;
+  box-shadow:0 8px 18px rgba(17,24,39,.06);
 }
-
-.logo-box {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #d9d9d9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+.search{
+  display:flex; align-items:center; gap:10px;
+  background:#f9fafb;
+  padding:10px 14px;
+  border-radius:999px;
 }
+.search-ico{ width:18px; height:18px; opacity:.75; }
+.search input{ border:none; outline:none; background:transparent; width:100%; font-size:14px; }
 
-.logo-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.grid{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:18px; }
+.item-card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 8px 18px rgba(17,24,39,.06);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
-
-.logo-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
+.item-img{
+  width:100%;
+  aspect-ratio: 4 / 3;    
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f9fafb;
+  border-radius:12px;
+  overflow:hidden;
 }
+.item-img img{ max-width:100%; max-height:100%; object-fit:contain; }
+.item-name{ margin:0; font-size:14px; font-weight:700; }
+.item-category{ margin:2px 0 0; font-size:12px; color:#9ca3af; }
+.item-status{ margin:6px 0 0; font-size:12px; font-weight:700; color:#10b981; }
+.item-status.off{ color:#f97316; }
 
-.nav-menu {
-  display: flex;
-  gap: 32px;
-  font-size: 14px;
-  font-weight: 500;
+.btn{
+  margin-top:6px;
+  height:36px;
+  border-radius:10px;
+  background:#1e40af;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
 }
+.btn:disabled{ background:#9ca3af; cursor:not-allowed; }
+.empty{ grid-column:1 / -1; text-align:center; color:#6b7280; padding:26px 0; }
 
-.nav-link {
-  position: relative;
-  opacity: 0.9;
+.footer{
+  position:relative;
+  background:#1e40af;
+  color:#fff;
+  padding:40px 0;
 }
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -6px;
-  width: 100%;
-  height: 2px;
-  border-radius: 999px;
-  background: #ffffff;
+.footer__bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:1; 
+  pointer-events:none;
 }
+.footer__inner{ position:relative; display:grid; grid-template-columns:1.2fr 1.8fr; gap:26px; }
+.brand--footer .brand__name{ color:#fff; }
 
-.nav-link:hover {
-  opacity: 1;
+.footer__tagline{ margin-top:10px; opacity:.95; font-size:14px; line-height:1.5; }
+
+.social{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+.social__btn{
+  width:38px; height:38px;
+  border-radius:12px;
+  background:rgba(255,255,255,.12);
+  display:grid; place-items:center;
 }
+.social__btn img{ width:22px; height:22px; }
 
-.nav-right-square {
-  width: 32px;
-  height: 32px;
-  background: #d9d9d9;
+.footer__links{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap:18px;
+  align-content:start;
 }
+.footer__col{ display:grid; gap:8px; font-size:14px; }
+.footer__col a{ opacity:.95; }
+.footer__col a:hover{ opacity:1; text-decoration:underline; }
 
-/* ============ MAIN CONTENT ============ */
-.inventory-main {
-  flex: 1;
-  padding: 32px 40px 72px;
+.footer__locTitle{ font-weight:700; margin-bottom:6px; }
+.footer__loc p{ margin:0; opacity:.95; line-height:1.5; }
+
+.footer__bottom{
+  grid-column:1 / -1;
+  margin-top:10px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.18);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:14px;
+  opacity:.95;
 }
+.footer__privacy{ opacity:.95; }
+.footer__privacy:hover{ opacity:1; text-decoration:underline; }
 
-.inventory-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 24px;
+@media (max-width: 992px){
+  .inventory-layout{ grid-template-columns:1fr; }
+  .nav{ display:none; }
+  .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer__inner{ grid-template-columns:1fr; }
+  .footer__links{ grid-template-columns:1fr 1fr; }
 }
-
-/* SIDEBAR */
-.filter-sidebar {
-  min-width: 220px;
-}
-
-.filter-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px 24px 28px;
-  box-shadow: 0 10px 45px rgba(15, 23, 42, 0.06);
-}
-
-.filter-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.filter-title-spaced {
-  margin-top: 24px;
-}
-
-.filter-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.filter-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  color: #4b5563;
-  padding: 6px 0;
-}
-
-.filter-checkbox {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1.5px solid #d1d5db;
-}
-
-/* CONTENT AREA */
-.inventory-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* search bar */
-.search-bar-wrapper {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 12px 16px;
-  box-shadow: 0 10px 45px rgba(15, 23, 42, 0.06);
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f9fafb;
-  border-radius: 999px;
-  padding: 10px 16px;
-}
-
-.search-bar input {
-  border: none;
-  outline: none;
-  background: transparent;
-  flex: 1;
-  font-size: 14px;
-}
-
-.search-icon {
-  font-size: 14px;
-}
-
-/* product grid */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-}
-
-.item-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 18px 18px 20px;
-  box-shadow: 0 10px 45px rgba(15, 23, 42, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.item-img-wrap {
-  width: 100%;
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.item-img-wrap img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.item-info {
-  font-size: 12px;
-}
-
-.item-name {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  color: #111827;
-}
-
-.item-category {
-  color: #9ca3af;
-  margin-bottom: 2px;
-}
-
-.item-status {
-  color: #10b981;
-  font-weight: 500;
-}
-
-.item-status-unavailable {
-  color: #f97316;
-}
-
-/* ============ FOOTER ============ */
-.site-footer {
-  background: #1f3fb5;
-  color: #e5e7eb;
-  padding: 40px 40px 20px;
-}
-
-.footer-inner {
-  max-width: 1200px;
-  margin: 0 auto 20px;
-  display: flex;
-  justify-content: space-between;
-  gap: 48px;
-}
-
-.footer-left {
-  max-width: 260px;
-}
-
-.footer-logo-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.footer-logo-box {
-  width: 32px;
-  height: 32px;
-  background: #ffffff;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.footer-logo-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.footer-logo-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.footer-tagline {
-  font-size: 12px;
-  margin-bottom: 16px;
-}
-
-.footer-social {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.footer-social img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
-
-/* columns */
-.footer-columns {
-  display: flex;
-  gap: 60px;
-  font-size: 12px;
-}
-
-.footer-col h4 {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.footer-col a {
-  display: block;
-  color: #e5e7eb;
-  margin-bottom: 6px;
-  text-decoration: none;
-}
-
-.footer-col a:hover {
-  text-decoration: underline;
-}
-
-.footer-col p {
-  line-height: 1.5;
-}
-
-/* bottom row */
-.footer-bottom {
-  max-width: 1200px;
-  margin: 0 auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding-top: 10px;
-  font-size: 11px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-privacy {
-  color: #e5e7eb;
-}
-
-/* ============ RESPONSIVE ============ */
-@media (max-width: 1024px) {
-  .inventory-inner {
-    grid-template-columns: 1fr;
-  }
-  .filter-sidebar {
-    order: -1;
-  }
-  .card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .footer-columns {
-    gap: 32px;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding-inline: 20px;
-  }
-  .inventory-main {
-    padding: 24px 20px 60px;
-  }
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  .footer-inner {
-    flex-direction: column;
-  }
-  .footer-columns {
-    flex-direction: column;
-  }
+@media (max-width: 640px){
+  .grid{ grid-template-columns:1fr; }
+  .footer__links{ grid-template-columns:1fr; }
 }
 </style>
