@@ -1,22 +1,10 @@
+// server/db/prisma.ts
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
-const connectionString = process.env.DATABASE_URL;
+// Pakai connection string dari .env
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
 
-const adapter = new PrismaPg({ connectionString });
-
-const prismaClientSingleton = () => {
-  	return new PrismaClient({ adapter });
-};
-
-declare const globalThis: {
-  	prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
-
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+const prisma = new PrismaClient({ adapter });
 
 export default prisma;
-
-if (process.env.NODE_ENV !== 'production') {
-  	globalThis.prismaGlobal = prisma;
-}
