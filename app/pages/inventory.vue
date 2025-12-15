@@ -1,3 +1,4 @@
+
 <template>
   <div class="page">
     <header class="header">
@@ -17,7 +18,7 @@
         <button class="header__avatar" type="button" aria-label="User menu">
         <img :src="assets.headerLogo" alt="User Avatar"
         />
-</button>
+        </button>
       </div>
     </header>
 
@@ -80,9 +81,9 @@
                 </p>
               </div>
 
-              <button class="btn" :disabled="!item.available" @click="requestItem(item)">
-                Request
-              </button>
+            <button class="btn" :disabled="!item.available" @click="goDetail(item)">
+              Request
+            </button>
             </article>
 
             <div v-if="filteredItems.length === 0" class="empty">
@@ -158,6 +159,19 @@
 <script setup>
 import { computed, ref } from 'vue'
 
+function goDetail(item) {
+  navigateTo({
+    path: '/detail',
+    query: {
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      img: item.img,
+      available: item.available ? '1' : '0',
+      desc: item.desc || ''
+    }
+  })
+}
 
 const assets = {
   footerBg: '/Inventory/rectangle4031410-l8vg-1500w.png',
@@ -185,13 +199,13 @@ const categories = [
 ]
 
 const items = [
-  { id: 1, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image111485-6wwn-200h.png' },
-  { id: 2, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: false, img: '/Inventory/image101492-b7t-200h.png' },
-  { id: 3, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image101499-i4i8-200h.png' },
+  { id: 1, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image111485-6wwn-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.' },
+  { id: 2, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: false, img: '/Inventory/image101492-b7t-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.'},
+  { id: 3, name: 'Leonardo R3', category: 'Microcontrollers & Boards', available: true,  img: '/Inventory/image101499-i4i8-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.'},
 
-  { id: 4, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101508-dwdf-200h.png' },
-  { id: 5, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101516-cjmo-200h.png' },
-  { id: 6, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101524-xxwo-200h.png' },
+  { id: 4, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101508-dwdf-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.' },
+  { id: 5, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101516-cjmo-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.' },
+  { id: 6, name: 'Micro Servo SG90', category: 'Actuators & Output Devices', available: true, img: '/Inventory/image101524-xxwo-200h.png', desc: 'The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB communication, eliminating the need for a secondary processor. This allows the Leonardo to appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.'},
 ]
 
 const search = ref('')

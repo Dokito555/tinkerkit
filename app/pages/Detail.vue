@@ -27,14 +27,18 @@
         <div class="layout">
           <aside class="left">
             <div class="left__imageCard">
-              <img :src="productImage" alt="Leonardo R3" class="left__img" />
+              <img :src="product.img" :alt="product.name" class="left__img" />
             </div>
 
             <div class="left__statusCard">
-              <div class="left__status">Status Available</div>
+              <div class="left__status">
+                {{ product.available ? 'Status Available' : 'Status Unavailable' }}
+                </div>
 
               <div class="left__ctaWrap">
-                <button class="btn-primary" type="button">Borrow Now</button>
+                <button class="btn-primary" type="button" :disabled="!product.available">
+                Borrow Now
+                </button>
               </div>
 
               <div v-if="selectedLabel" class="left__selected">
@@ -47,13 +51,9 @@
           <!-- RIGHT -->
           <section class="right">
             <article class="card">
-              <h1 class="title">Leonardo R3</h1>
-              <p class="subtitle">Microcontroller &amp; Boards</p>
-              <p class="desc">
-                The Leonardo differs from all preceding boards in that the ATmega32u4 has built-in USB
-                communication, eliminating the need for a secondary processor. This allows the Leonardo to
-                appear to a connected computer as a mouse and keyboard, in addition to a virtual (CDC) serial / COM port.
-              </p>
+             <h1 class="title">{{ product.name }}</h1>
+              <p class="subtitle">{{ product.category }}</p>
+              <p class="desc">{{ product.desc }}</p>
             </article>
 
             <article class="card card--calendar">
@@ -158,12 +158,13 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-const logoHeader   = '/app_icon.svg'
-const logoFooter   = '/app_icon.svg'
+const route = useRoute()
 
-const productImage = '/Detail/image111340-ssq-400h.png'
-const previewImage = '/Detail/rectangle4481341-pqee-500w.png'
+/** asset tetap */
+const logoHeader = '/app_icon.svg'
+const logoFooter = '/app_icon.svg'
 
 const iconPrev = '/Detail/oouinextrtl1407-sfid.svg'
 const iconNext = '/Detail/oouinextltr1405-awg.svg'
@@ -174,10 +175,22 @@ const iconEmail   = '/Detail/icbaselineemail1328-6104.svg'
 const iconDiscord = '/Detail/icbaselinediscord1330-rfu.svg'
 const iconWa      = '/Detail/riwhatsappfill1332-9z0o.svg'
 
+const product = computed(() => {
+  const q = route.query
+  return {
+    id: Number(q.id || 0),
+    name: String(q.name || 'Leonardo R3'),
+    category: String(q.category || 'Microcontroller & Boards'),
+    img: String(q.img || '/Detail/image111340-ssq-400h.png'),
+    available: q.available === '1' || q.available === 1 || q.available === true,
+    desc: String(q.desc || '')
+  }
+})
 
+/** kalender (tetap) */
 const daysOfWeek = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-const current = ref(new Date())     
-const selected = ref(null)         
+const current = ref(new Date())
+const selected = ref(null)
 
 function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1) }
 function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0) }
@@ -205,8 +218,6 @@ const calendarCells = computed(() => {
   const today = new Date()
 
   const start = startOfMonth(base)
-  const end = endOfMonth(base)
-
   const startGrid = new Date(start)
   startGrid.setDate(start.getDate() - mondayIndex(start.getDay()))
 
@@ -224,7 +235,6 @@ const calendarCells = computed(() => {
       isSelected: selected.value ? isSameDate(d, selected.value) : false,
     })
   }
-
   return cells
 })
 
@@ -307,6 +317,7 @@ img { max-width: 100%; height: auto; display: block; }
 .left__selected { margin-top: 12px; font-size: 13px; color: #374151; }
 
 .btn-primary { width: 100%; height: 52px; border-radius: 12px; background: #1e40af; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; }
+.btn-primary:disabled{background:#9ca3af; cursor:not-allowed;}
 .btn-primary:hover { filter: brightness(1.05); }
 
 .left__preview { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06); }
